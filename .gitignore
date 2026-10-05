@@ -66,3 +66,7 @@ vcpkg_installed/
 # test output & cache
 Testing/
 .cache/
+
+# Tournament ratings (machine-local)
+Tournament/log/
+__pycache__/

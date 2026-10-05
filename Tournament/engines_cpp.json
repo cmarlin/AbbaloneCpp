@@ -1,0 +1,129 @@
+{
+  "board": "classical",
+  "games_per_pair": 2,
+  "move_limit": 300,
+  "move_timeout": 10.0,
+  "random_plies": 10,
+  "engines": [
+    {
+      "name": "cpp-bb-minimax-d2",
+      "cmd": [
+        "Sources/BitboardAbalone/build/atp_engine_bb",
+        "--depth",
+        "2",
+        "--algo",
+        "minimax"
+      ]
+    },
+    {
+      "name": "cpp-bb-abrnd-d2",
+      "cmd": [
+        "Sources/BitboardAbalone/build/atp_engine_bb",
+        "--depth",
+        "2",
+        "--algo",
+        "abrnd"
+      ]
+    },
+    {
+      "name": "cpp-bb-absort-d2",
+      "cmd": [
+        "Sources/BitboardAbalone/build/atp_engine_bb",
+        "--depth",
+        "2",
+        "--algo",
+        "absort"
+      ]
+    },
+    {
+      "name": "cpp-bb-abradix-d2",
+      "cmd": [
+        "Sources/BitboardAbalone/build/atp_engine_bb",
+        "--depth",
+        "2",
+        "--algo",
+        "abradix"
+      ]
+    },
+    {
+      "name": "cpp-bb-absort-d3",
+      "cmd": [
+        "Sources/BitboardAbalone/build/atp_engine_bb",
+        "--depth",
+        "3",
+        "--algo",
+        "absort"
+      ]
+    },
+    {
+      "name": "cpp-bb-abtt-d3",
+      "cmd": [
+        "Sources/BitboardAbalone/build/atp_engine_bb",
+        "--depth",
+        "3",
+        "--algo",
+        "abtt"
+      ]
+    },
+    {
+      "name": "cpp-bb-abtt-d4",
+      "cmd": [
+        "Sources/BitboardAbalone/build/atp_engine_bb",
+        "--depth",
+        "4",
+        "--algo",
+        "abtt"
+      ]
+    },
+    {
+      "name": "cpp-bb-id50",
+      "cmd": [
+        "Sources/BitboardAbalone/build/atp_engine_bb",
+        "--budget",
+        "50"
+      ]
+    },
+    {
+      "name": "cpp-bb-id100",
+      "cmd": [
+        "Sources/BitboardAbalone/build/atp_engine_bb",
+        "--budget",
+        "100"
+      ]
+    },
+    {
+      "name": "cpp-bb-id200",
+      "cmd": [
+        "Sources/BitboardAbalone/build/atp_engine_bb",
+        "--budget",
+        "200"
+      ]
+    },
+    {
+      "name": "py-random",
+      "cmd": [
+        "python3",
+        "Tournament/atp_pyspiel.py",
+        "--bot",
+        "random"
+      ],
+      "env": {
+        "PYTHONPATH": "/home/user/projects/open_spiel_abalone/build/lib.linux-x86_64-cpython-312"
+      }
+    },
+    {
+      "name": "py-uct-100",
+      "cmd": [
+        "python3",
+        "Tournament/atp_pyspiel.py",
+        "--bot",
+        "uct",
+        "--simulations",
+        "100"
+      ],
+      "env": {
+        "PYTHONPATH": "/home/user/projects/open_spiel_abalone/build/lib.linux-x86_64-cpython-312"
+      }
+    }
+  ]
+}
