@@ -1,0 +1,17 @@
+[build-system]
+requires = ["scikit-build-core>=0.11", "pybind11>=2.13"]
+build-backend = "scikit_build_core.build"
+
+[project]
+name = "abbalone-cpp"
+version = "1.0.0"
+description = "Solveur Abalone bitboard en C++ exposé en Python (pybind11)"
+readme = "README.md"
+requires-python = ">=3.9"
+license = { file = "LICENSE" }
+
+[tool.scikit-build]
+# Le CMakeLists du module Python vit dans python/ ; il compile le cœur
+# bitboard depuis Sources/BitboardAbalone sans le dupliquer.
+cmake.source-dir = "python"
+wheel.packages = ["python/abbalone_cpp"]

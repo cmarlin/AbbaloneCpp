@@ -61,6 +61,46 @@ Options principales : `--depth N`, `--algo minimax|abrnd|absort|abradix|abtt`,
 `--budget N` (iterative deepening, N ms par coup), `--tt-mb N` (taille de la
 table de transposition).
 
+## Utilisation depuis Python
+
+Le solveur est packagé comme module Python (`abbalone-cpp`, bindings pybind11
+compilant le cœur bitboard sans le dupliquer) :
+
+```
+pip install /chemin/vers/AbbaloneCpp
+```
+
+Depuis le `requirements.txt` d'un autre projet :
+
+```
+abbalone-cpp @ file:///chemin/vers/AbbaloneCpp
+```
+
+(ou `-e /chemin/vers/AbbaloneCpp` pour une installation éditable, ou
+`abbalone-cpp @ git+https://.../AbbaloneCpp.git` pour un dépôt distant ;
+prérequis : compilateur C++17 et CMake, la compilation se fait à
+l'installation).
+
+```python
+import abbalone_cpp as ab
+
+board = ab.Board.classical()          # joueur 0 = blanc, 1 = noir
+len(board.legal_moves(0))             # 44
+
+solver = ab.Solver(algo="abtt", depth=4)          # profondeur fixe
+# ou : ab.Solver(budget_ms=200, depth=20)         # iterative deepening
+move = solver.best_move(board, player=0)          # Move ou None
+ab.move_to_atp(board, 0, move)                   # 'a1b2' (notation ATP)
+board.apply(move, 0)                             # sur place, lève ValueError si illégal
+```
+
+API : `Board` (`classical()`, `legal_moves`, `is_legal`, `apply`, `evaluate`,
+`copy`, masques `p0`/`p1`), `Solver` (`best_move`, compteurs `nodes`/`leaves`,
+`last_depth`/`last_score` du mode budget), `parse_atp`/`move_to_atp`
+(notation ATP, identique à celle du jeu pyspiel `abalone`), `perft`,
+`cell_name`/`cell_from_name`. La recherche garde le GIL : pour paralléliser,
+utilisez des processus (un `Solver` par processus).
+
 ## Tournois
 
 Le tournoi fait s'affronter les moteurs d'un config JSON
@@ -87,5 +127,6 @@ PYTHONPATH=<chemin du build OpenSpiel> \
 ```
 Sources/BitboardAbalone/   solveur bitboard (cœur, recherche, TT, ID, ATP)
 Sources/SpielAbalone/      cœur de référence (validation croisée du perft)
+python/                    bindings pybind11 (package abbalone-cpp)
 Tournament/                arbitre de tournoi, moteur ATP pyspiel, configs
 ```
