@@ -55,6 +55,69 @@ def test_cells():
         ab.cell_from_name("z9")
 
 
+# --- Plateaux de départ et affichage OpenSpiel -------------------------------
+
+BELGIAN_DAISY = """board = 
+<i>           2   2   .   1   1
+<h>         2   2   2   1   1   1
+<g>       .   2   2   .   1   1   .
+<f>     .   .   .   .   .   .   .   .
+<e>   .   .   .   .   .   .   .   .   .
+<d>     .   .   .   .   .   .   .   .  <9>
+<c>       .   1   1   .   2   2   .  <8>
+<b>         1   1   1   2   2   2  <7>
+<a>           1   1   .   2   2  <6>
+               <1> <2> <3> <4> <5>
+move_number_ = 0
+"""
+
+
+def test_layouts():
+    daisy = ab.Board.belgian_daisy()
+    assert ab.Board.from_layout("belgian-daisy") == daisy
+    assert ab.Board.from_layout("classic") == ab.Board.classical()
+    assert ab.Board.from_string(BELGIAN_DAISY) == daisy
+    assert bin(daisy.p0).count("1") == bin(daisy.p1).count("1") == 14
+    with pytest.raises(ValueError, match="unknown layout"):
+        ab.Board.from_layout("snake")
+
+
+@pytest.mark.parametrize(
+    "edit,message",
+    [
+        (lambda t: t.replace("<e>", "<x>"), "row <e> missing"),
+        (lambda t: t.replace("<a>           1", "<a>           x"), "unexpected token"),
+        (lambda t: t.replace("1   1   .   2   2  <6>", "1   1   .   2  <6>"), "missing cells"),
+        (lambda t: t + "<a>  1 1 1 1 1\n", "given twice"),
+    ],
+)
+def test_from_string_rejects(edit, message):
+    with pytest.raises(ValueError, match=message):
+        ab.Board.from_string(edit(BELGIAN_DAISY))
+
+
+def test_from_string_matches_pyspiel():
+    """Plateau reconstruit depuis l'affichage pyspiel : mêmes coups légaux."""
+    pyspiel = pytest.importorskip("pyspiel")
+    random = pytest.importorskip("random")
+    try:
+        game = pyspiel.load_game("abalone(board=belgian-daisy)")
+    except pyspiel.SpielError:
+        pytest.skip("pyspiel sans le jeu abalone belgian-daisy")
+    rng = random.Random(0)
+    for _ in range(20):
+        state = game.new_initial_state()
+        for _ in range(rng.randrange(60)):
+            if state.is_terminal():
+                break
+            board = ab.Board.from_string(str(state))
+            player = state.current_player()
+            expected = sorted(state.action_to_string(player, a) for a in state.legal_actions())
+            got = sorted(ab.move_to_atp(board, player, m) for m in board.legal_moves(player))
+            assert got == expected
+            state.apply_action(rng.choice(state.legal_actions()))
+
+
 # --- Validation des entrées ---------------------------------------------------
 
 

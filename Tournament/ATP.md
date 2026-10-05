@@ -59,7 +59,7 @@ coups (draw).
 
 | Moteur | Commande | IA |
 |---|---|---|
-| `atp-cpp-bb` | `Sources/BitboardAbalone/build/atp_engine_bb [--depth N] [--window N] [--quiescent] [--algo minimax\|abrnd\|absort\|abradix\|abtt] [--budget N] [--tt-mb N]` | solveur bitboard 2 x uint64 : minimax, alpha-beta (ordres aléatoire/trié/radix), alpha-beta avec table de transposition, iterative deepening (`--budget`, ms par coup) ; plateau classical |
+| `atp-cpp-bb` | `Sources/BitboardAbalone/build/atp_engine_bb [--depth N] [--window N] [--quiescent] [--algo minimax\|abrnd\|absort\|abradix\|abtt] [--budget N] [--tt-mb N]` | solveur bitboard 2 x uint64 : minimax, alpha-beta (ordres aléatoire/trié/radix), alpha-beta avec table de transposition, iterative deepening (`--budget`, ms par coup) ; plateaux classical et belgian-daisy |
 | `atp-pyspiel` | `python3 Tournament/atp_pyspiel.py --bot random\|uct [--simulations N]` | bots Python : aléatoire, UCT (MCTS léger, rollouts aléatoires) |
 
 ## Tournois

@@ -162,6 +162,21 @@ void InitTables();
 // player 0 rows a,b,c ; player 1 rows g,h,i).
 Board ClassicalBoard();
 
+// Belgian daisy starting position (identical to abalone_core
+// ABALONE_INIT_BELGIAN_DAISY).
+Board BelgianDaisyBoard();
+
+// Starting position by layout name: "classical" (or "classic"),
+// "belgian-daisy". Returns false for an unknown name.
+bool LayoutBoard(const std::string& name, Board* out);
+
+// Board from its OpenSpiel `abalone` display: one line per row, "<a>" to
+// "<i>" then the row's cells, "1" for player 0, "2" for player 1, "." for an
+// empty cell; coordinate labels such as "<7>" and any other line are
+// ignored. Every row must be present once with its full cell count. Returns
+// false and sets *error otherwise.
+bool ParseBoardText(const std::string& text, Board* out, std::string* error);
+
 // ---------------------------------------------------------------------------
 // Moves
 // ---------------------------------------------------------------------------

@@ -57,6 +57,8 @@ echo -e "board classical\ngenmove white\nquit" \
   | Sources/BitboardAbalone/build/atp_engine_bb --depth 4 --algo abtt
 ```
 
+Plateaux de départ (`board <nom>`) : `classical`, `belgian-daisy`.
+
 Options principales : `--depth N`, `--algo minimax|abrnd|absort|abradix|abtt`,
 `--budget N` (iterative deepening, N ms par coup), `--tt-mb N` (taille de la
 table de transposition).
@@ -94,7 +96,9 @@ ab.move_to_atp(board, 0, move)                   # 'a1b2' (notation ATP)
 board.apply(move, 0)                             # sur place, lève ValueError si illégal
 ```
 
-API : `Board` (`classical()`, `legal_moves`, `is_legal`, `apply`, `evaluate`,
+API : `Board` (`classical()`, `belgian_daisy()`, `from_layout(nom)`,
+`from_string(affichage)` qui relit l'affichage d'un état pyspiel `abalone`,
+`legal_moves`, `is_legal`, `apply`, `evaluate`,
 `copy`, masques `p0`/`p1`), `Solver` (`best_move`, compteurs `nodes`/`leaves`,
 `last_depth`/`last_score` du mode budget), `parse_atp`/`move_to_atp`
 (notation ATP, identique à celle du jeu pyspiel `abalone`), `perft`,

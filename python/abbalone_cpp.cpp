@@ -306,6 +306,26 @@ PYBIND11_MODULE(_engine, m) {
       .def(py::init([]() { return Board{{0, 0}}; }))
       .def(py::init(&MakeBoard), py::arg("p0"), py::arg("p1"))
       .def_static("classical", []() { return ClassicalBoard(); })
+      .def_static("belgian_daisy", []() { return BelgianDaisyBoard(); })
+      .def_static(
+          "from_layout",
+          [](const std::string& name) {
+            Board b;
+            if (!LayoutBoard(name, &b))
+              throw std::invalid_argument("unknown layout: " + name);
+            return b;
+          },
+          py::arg("name"))
+      .def_static(
+          "from_string",
+          [](const std::string& text) {
+            Board b;
+            std::string error;
+            if (!ParseBoardText(text, &b, &error))
+              throw std::invalid_argument(error);
+            return b;
+          },
+          py::arg("text"))
       .def_property(
           "p0", [](const Board& b) { return b.p[0]; },
           [](Board& b, uint64_t v) {

@@ -6,6 +6,7 @@
 #include "doctest.h"
 
 #include "bb_core.h"
+#include "open_spiel/games/abalone/abalone_boards.h"
 #include "open_spiel/games/abalone/abalone_core.h"
 
 #include <vector>
@@ -179,3 +180,73 @@ TEST_CASE("atp: known moves and rejections") {
   Move good{E, Single_1, static_cast<uint8_t>(CellFromName("c5"))};
   CHECK(MoveToAtp(b, 0, good) == "c5c6");
 }
+
+// Bitboard of a reference starting table (row 0 = 'a', as kCellOf).
+Board BoardFromRefTable(
+    const abalone_core::CellState (&table)[abalone_core::kNumRows]
+                                          [abalone_core::kNumCols]) {
+  Board b{{0, 0}};
+  for (int row = 0; row < kDim; ++row)
+    for (int col = 0; col < kDim; ++col) {
+      const int cell = kCellOf[row][col];
+      if (cell < 0) continue;
+      if (table[row][col] == abalone_core::Player0) b.p[0] |= kBit[cell];
+      if (table[row][col] == abalone_core::Player1) b.p[1] |= kBit[cell];
+    }
+  return b;
+}
+
+TEST_CASE("layouts: belgian daisy matches the reference table") {
+  InitTables();
+  const Board ref = BoardFromRefTable(abalone_core::ABALONE_INIT_BELGIAN_DAISY);
+  const Board b = BelgianDaisyBoard();
+  CHECK(b.p[0] == ref.p[0]);
+  CHECK(b.p[1] == ref.p[1]);
+  CHECK(__builtin_popcountll(b.p[0]) == 14);
+  CHECK(__builtin_popcountll(b.p[1]) == 14);
+
+  Board named{{0, 0}};
+  CHECK(LayoutBoard("belgian-daisy", &named));
+  CHECK(named.p[0] == b.p[0]);
+  CHECK(LayoutBoard("classic", &named));
+  CHECK(named.p[0] == ClassicalBoard().p[0]);
+  CHECK_FALSE(LayoutBoard("snake", &named));
+}
+
+TEST_CASE("layouts: board text round-trip and rejections") {
+  InitTables();
+  // OpenSpiel display of the classical start, labels included
+  const std::string classical =
+      "board = \n"
+      "<i>           2   2   2   2   2\n"
+      "<h>         2   2   2   2   2   2\n"
+      "<g>       .   .   2   2   2   .   .\n"
+      "<f>     .   .   .   .   .   .   .   .\n"
+      "<e>   .   .   .   .   .   .   .   .   .\n"
+      "<d>     .   .   .   .   .   .   .   .  <9>\n"
+      "<c>       .   .   1   1   1   .   .  <8>\n"
+      "<b>         1   1   1   1   1   1  <7>\n"
+      "<a>           1   1   1   1   1  <6>\n"
+      "               <1> <2> <3> <4> <5>\n"
+      "move_number_ = 0\n";
+  Board b{{0, 0}};
+  std::string error;
+  REQUIRE(ParseBoardText(classical, &b, &error));
+  CHECK(b.p[0] == ClassicalBoard().p[0]);
+  CHECK(b.p[1] == ClassicalBoard().p[1]);
+
+  std::string missing = classical;
+  missing.erase(missing.find("<e>"), missing.find("<d>") - missing.find("<e>"));
+  CHECK_FALSE(ParseBoardText(missing, &b, &error));
+  CHECK(error == "row <e> missing");
+
+  std::string bad = classical;
+  bad.replace(bad.find("<a>           1"), 16, "<a>           x");
+  CHECK_FALSE(ParseBoardText(bad, &b, &error));
+
+  std::string short_row = classical;
+  short_row.replace(short_row.find("1   1   1   1   1  <6>"), 22, "1   1   1   1  <6>");
+  CHECK_FALSE(ParseBoardText(short_row, &b, &error));
+  CHECK(error == "missing cells in row <a>");
+}
+

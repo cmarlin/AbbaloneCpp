@@ -5,6 +5,7 @@
 #include "bb_core.h"
 
 #include <cctype>
+#include <sstream>
 
 namespace bb {
 
@@ -107,6 +108,84 @@ bool TryParseAtp(const Board& b, int player, const std::string& str,
         return true;
       }
     }
+  }
+  return false;
+}
+
+bool ParseBoardText(const std::string& text, Board* out, std::string* error) {
+  InitTables();
+  Board b{{0, 0}};
+  bool seen[kDim] = {};
+  std::istringstream lines(text);
+  std::string line;
+  while (std::getline(lines, line)) {
+    std::istringstream tokens(line);
+    std::string label;
+    if (!(tokens >> label) || label.size() != 3 || label[0] != '<' ||
+        label[2] != '>' || label[1] < 'a' || label[1] > 'i')
+      continue;
+    const int row = label[1] - 'a';
+    if (seen[row]) {
+      *error = "row " + label + " given twice";
+      return false;
+    }
+    seen[row] = true;
+    // the row's cells, left to right, start at column max(0, row - 4)
+    int col = row > 4 ? row - 4 : 0;
+    std::string token;
+    while (tokens >> token && token[0] != '<') {
+      if (token != "." && token != "1" && token != "2") {
+        *error = "unexpected token '" + token + "' in row " + label;
+        return false;
+      }
+      const int cell = col < kDim ? kCellOf[row][col] : -1;
+      if (cell < 0) {
+        *error = "too many cells in row " + label;
+        return false;
+      }
+      if (token != ".") b.p[token[0] - '1'] |= kBit[cell];
+      ++col;
+    }
+    if (col < kDim && kCellOf[row][col] >= 0) {
+      *error = "missing cells in row " + label;
+      return false;
+    }
+  }
+  for (int row = 0; row < kDim; ++row)
+    if (!seen[row]) {
+      *error = std::string("row <") + static_cast<char>('a' + row) + "> missing";
+      return false;
+    }
+  *out = b;
+  return true;
+}
+
+Board BelgianDaisyBoard() {
+  // ABALONE_INIT_BELGIAN_DAISY, as OpenSpiel displays it
+  static const char kLayout[] =
+      "<i>           2   2   .   1   1\n"
+      "<h>         2   2   2   1   1   1\n"
+      "<g>       .   2   2   .   1   1   .\n"
+      "<f>     .   .   .   .   .   .   .   .\n"
+      "<e>   .   .   .   .   .   .   .   .   .\n"
+      "<d>     .   .   .   .   .   .   .   .\n"
+      "<c>       .   1   1   .   2   2   .\n"
+      "<b>         1   1   1   2   2   2\n"
+      "<a>           1   1   .   2   2\n";
+  Board b;
+  std::string error;
+  ParseBoardText(kLayout, &b, &error);
+  return b;
+}
+
+bool LayoutBoard(const std::string& name, Board* out) {
+  if (name == "classical" || name == "classic") {
+    *out = ClassicalBoard();
+    return true;
+  }
+  if (name == "belgian-daisy") {
+    *out = BelgianDaisyBoard();
+    return true;
   }
   return false;
 }

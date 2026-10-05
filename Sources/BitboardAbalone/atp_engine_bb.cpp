@@ -39,6 +39,8 @@ bb::Algo g_algo = bb::Algo::AB_Sort;
 bb::TranspositionTable* g_tt = nullptr;
 
 bb::Board g_board;
+// starting position of `board`, restored by clear_board
+bb::Board g_layout;
 int g_player = 0;  // white = player 0, plays first
 
 bool ParseLine(const std::string& line, std::string* command,
@@ -100,7 +102,7 @@ int main(int argc, char** argv) {
   }
 
   bb::InitTables();
-  g_board = bb::ClassicalBoard();
+  g_layout = g_board = bb::ClassicalBoard();
   const bb::EvalWeights weights = bb::EvalWeights::Default();
   const bb::SearchConfig config(weights, g_quiescent, g_window);
   if (g_algo == bb::Algo::AB_TT || g_budgetMs > 0)
@@ -129,16 +131,16 @@ int main(int argc, char** argv) {
     } else if (command == "board") {
       if (args.empty()) {
         result = "missing board name";
-      } else if (args[0] != "classical" && args[0] != "classic") {
+      } else if (!bb::LayoutBoard(args[0], &g_layout)) {
         result = "unsupported board";
       } else {
-        g_board = bb::ClassicalBoard();
+        g_board = g_layout;
         g_player = 0;
         if (g_tt) g_tt->Clear();
         ok = true;
       }
     } else if (command == "clear_board") {
-      g_board = bb::ClassicalBoard();
+      g_board = g_layout;
       g_player = 0;
       if (g_tt) g_tt->Clear();
       ok = true;
