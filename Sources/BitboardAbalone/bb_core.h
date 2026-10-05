@@ -292,8 +292,8 @@ struct SearchContext {
   // Radix scratch, per depth: move counts per rank and the sorted buffer.
   int32_t radixCounts[kMaxDepth][kMaxRanks];
   int32_t radixBuffer[kMaxDepth][kMaxMoves];
-  long nodeCount = 0;
-  long leafCount = 0;
+  int64_t nodeCount = 0;
+  int64_t leafCount = 0;
   // Filled by GenMoveId: depth and score of the last completed iteration.
   int idDepth = 0;
   int idScore = 0;
@@ -338,7 +338,7 @@ int GenMoveId(const Board& b, int player, const SearchConfig& config,
 // Perft (for cross-validation against the reference core)
 // ---------------------------------------------------------------------------
 
-long Perft(const Board& b, int depth, int player);
+int64_t Perft(const Board& b, int depth, int player);
 
 // ---------------------------------------------------------------------------
 // ATP notation (canonical OpenSpiel/pyspiel strings)

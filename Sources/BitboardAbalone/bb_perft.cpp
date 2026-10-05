@@ -5,14 +5,14 @@
 
 namespace bb {
 
-long Perft(const Board& b, int depth, int player) {
+int64_t Perft(const Board& b, int depth, int player) {
   InitTables();
   if (depth == 0) return 1;
   MoveList moves;
   ComputeMoveList(moves, b, player);
   if (depth == 1) return MoveCount(moves);
   const auto& executors = Executors();
-  long count = 0;
+  int64_t count = 0;
   for (int d = 0; d < kNumDirs; ++d) {
     for (int id = Single_1; id < kNumMoveIds; ++id) {
       uint64_t m = moves.masks[d][id];

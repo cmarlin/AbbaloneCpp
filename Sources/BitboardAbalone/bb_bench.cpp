@@ -7,6 +7,7 @@
 // defaults to 64.
 
 #include <chrono>
+#include <cinttypes>
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
@@ -96,12 +97,13 @@ int main(int argc, char** argv) {
     if (ms < best_time) best_time = ms;
     if (algo == bb::Algo::AB_TT)
       std::printf(
-          "  run %d: %.2f ms  (score=%d nodes=%ld leaves=%ld tt: %ld/%ld "
-          "hits)\n",
+          "  run %d: %.2f ms  (score=%d nodes=%" PRId64 " leaves=%" PRId64
+          " tt: %" PRId64 "/%" PRId64 " hits)\n",
           i, ms, score, ctx.nodeCount, ctx.leafCount, tt.hits, tt.probes);
     else
-      std::printf("  run %d: %.2f ms  (score=%d nodes=%ld leaves=%ld)\n", i, ms,
-                  score, ctx.nodeCount, ctx.leafCount);
+      std::printf("  run %d: %.2f ms  (score=%d nodes=%" PRId64
+                  " leaves=%" PRId64 ")\n",
+                  i, ms, score, ctx.nodeCount, ctx.leafCount);
   }
 
   std::printf("\n");

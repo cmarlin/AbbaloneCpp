@@ -87,8 +87,8 @@ import abbalone_cpp as ab
 board = ab.Board.classical()          # joueur 0 = blanc, 1 = noir
 len(board.legal_moves(0))             # 44
 
-solver = ab.Solver(algo="abtt", depth=4)          # profondeur fixe
-# ou : ab.Solver(budget_ms=200, depth=20)         # iterative deepening
+solver = ab.Solver(algo="abtt", depth=4)          # profondeur fixe (défaut 3)
+# ou : ab.Solver(budget_ms=200)                   # iterative deepening, plafond 32
 move = solver.best_move(board, player=0)          # Move ou None
 ab.move_to_atp(board, 0, move)                   # 'a1b2' (notation ATP)
 board.apply(move, 0)                             # sur place, lève ValueError si illégal
@@ -98,8 +98,19 @@ API : `Board` (`classical()`, `legal_moves`, `is_legal`, `apply`, `evaluate`,
 `copy`, masques `p0`/`p1`), `Solver` (`best_move`, compteurs `nodes`/`leaves`,
 `last_depth`/`last_score` du mode budget), `parse_atp`/`move_to_atp`
 (notation ATP, identique à celle du jeu pyspiel `abalone`), `perft`,
-`cell_name`/`cell_from_name`. La recherche garde le GIL : pour paralléliser,
-utilisez des processus (un `Solver` par processus).
+`cell_name`/`cell_from_name`. Les entrées invalides (joueur autre que 0/1,
+bitboards hors des 61 cases ou qui se chevauchent, champs de `Move` hors
+bornes, paramètres du `Solver`) lèvent `ValueError`. `Board` et `Move` sont
+hashables et picklables. La recherche et le perft relâchent le GIL : plusieurs
+`Solver` peuvent chercher en parallèle dans des threads (une même instance
+sérialise ses appels).
+
+Tests du binding :
+
+```
+pip install "/chemin/vers/AbbaloneCpp[test]"
+pytest /chemin/vers/AbbaloneCpp
+```
 
 ## Tournois
 

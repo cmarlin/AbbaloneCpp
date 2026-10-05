@@ -6,7 +6,7 @@ du jeu pyspiel `abalone` et du moteur ATP `atp_engine_bb`.
 
 Exemple :
 
-    >>> import abalone_cpp as ab
+    >>> import abbalone_cpp as ab
     >>> board = ab.Board.classical()
     >>> len(board.legal_moves(0))
     44
@@ -16,9 +16,12 @@ Exemple :
     'a1b2'
     >>> board.apply(move, 0)
 
-La recherche garde le GIL : une recherche profonde bloque l'interpréteur.
-Pour paralléliser, utilisez des processus (un Solver par processus).
+La recherche et le perft relâchent le GIL : plusieurs Solver peuvent
+chercher en parallèle dans des threads (une même instance sérialise ses
+appels). Board et Move sont hashables et picklables.
 """
+
+from importlib.metadata import PackageNotFoundError, version
 
 from ._engine import (
     ALGORITHMS,
@@ -46,4 +49,7 @@ __all__ = [
     "perft",
 ]
 
-__version__ = "1.0.0"
+try:
+    __version__ = version("abbalone-cpp")
+except PackageNotFoundError:  # module importé hors d'une installation
+    __version__ = "0+unknown"

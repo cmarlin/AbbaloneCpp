@@ -62,9 +62,9 @@ class TranspositionTable {
              int flag, int move);
 
   // Stats since construction / last Clear.
-  long probes = 0;
-  long hits = 0;
-  long stores = 0;
+  int64_t probes = 0;
+  int64_t hits = 0;
+  int64_t stores = 0;
 
   size_t EntryCount() const { return count_; }
   size_t SizeBytes() const { return count_ * sizeof(TtEntry); }
